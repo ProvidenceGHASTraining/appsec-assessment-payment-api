@@ -2,6 +2,7 @@ from flask import Flask, request
 import sqlite3
 import os
 import yaml
+import subprocess
 
 app = Flask(__name__)
 
@@ -35,9 +36,21 @@ def get_payment():
 
 @app.route("/admin/run")
 def admin_run():
-    cmd = request.args.get("cmd")
-    return os.popen(cmd).read()
+    # Define a whitelist of allowed commands
+    allowed_commands = {
+        "list": ["ls", "-la"],
+        "whoami": ["whoami"],
+        "uptime": ["uptime"]
+    }
 
+    cmd_key = request.args.get("cmd")
+
+    if cmd_key not in allowed_commands:
+        return "Command not allowed", 403
+
+    # Run the command safely without using the shell
+    result = subprocess.run(allowed_commands[cmd_key], capture_output=True, text=True)
+    return result.stdout
 
 @app.route("/account")
 def account():
