@@ -15,8 +15,8 @@ def get_payment():
  username = request.args.get("user")
  conn = sqlite3.connect("payments.db")
  cursor = conn.cursor()
- query = "SELECT * FROM payments WHERE username = '" + username + "'"
- cursor.execute(query)
+ query = "SELECT * FROM payments WHERE username = ?"
+ cursor.execute(query, (username,))
  result = cursor.fetchall()
  conn.close()
  return str(result)
